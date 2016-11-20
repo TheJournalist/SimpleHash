@@ -38,7 +38,7 @@ void imprimeMenu(bool tudo, bool atual, HashTable* table)
         {
             cout << i;
             if(table->str[i] != nullptr)
-                for(int j=0; j<strlen(table->str[i]); j++)
+                for(unsigned int j=0; j<strlen(table->str[i]); j++)
                     cout << " ";
             cout << " | ";
         }
@@ -125,6 +125,43 @@ int inserir(const char *strg, HashTable* table)
     return h1;
 }
 
+//busca elemento e retorna sua posicao, retorna -1 para nao encontrado
+int busca(const char *strg, HashTable* table)
+{
+    int h1 = hash1(&strg[0u]);
+    int h2 = hash2(&strg[0u]);
+    int initial = h1;
+    //hash vazia
+    if(table->quantidade == 0)
+        return -1;
+
+    while(table->str[h1] != nullptr)
+    {
+        if(!strcmp(table->str[h1], strg)) //Achou o valor!
+            return h1;
+        h1 = (h1 + h2) % 10; //Tabela circular
+        if(h1==initial)//viu todos
+            break;
+    }
+    return -1;
+}
+
+//remove elemento e retorna sua posicao, retorna -1 para nao encontrado
+int remover(const char *strg, HashTable* table)
+{
+    int pos;
+    pos = busca(strg,table);
+    //elemento nao existe
+    if(pos == -1)
+        return -1;
+    //removendo
+    free(table->str[pos]);
+    table->str[pos]=nullptr;
+    table->quantidade--;
+
+    return pos;
+}
+
 int main()
 {
     char ent;
@@ -175,11 +212,37 @@ int main()
             break;
         /// Busca
         case '2':
-
+            while(1){
+                imprimeMenu(false, true, &table);
+                cout << " 2. Busca" << endl;
+                cout << "   Buscar (pressione apenas ENTER para sair): ";
+                getline(cin, entrada);
+                if(entrada == "")
+                    break;
+                ret = busca(&entrada[0u], &table);
+                if(ret == -1)
+                    cout << "   String nao se encontra na tabela!" << endl;
+                else
+                    cout << "   String encontrada, posicao: " << ret << endl;
+                system("pause");
+            }
             break;
         /// Remoção
         case '3':
-
+            while(1){
+                imprimeMenu(false, true, &table);
+                cout << " 2. Remocao" << endl;
+                cout << "   Remover (pressione apenas ENTER para sair): ";
+                getline(cin, entrada);
+                if(entrada == "")
+                    break;
+                ret = remover(&entrada[0u], &table);
+                if(ret == -1)
+                    cout << "   String nao se encontra na tabela!" << endl;
+                else
+                    cout << "   String removida da posicao: " << ret << endl;
+                system("pause");
+            }
             break;
         /// Entrada inválida
         default:
